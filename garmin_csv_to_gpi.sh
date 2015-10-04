@@ -1,7 +1,7 @@
 #!/bin/bash
 # auteur: ledudulela
 version="1.1"
-# màj: 2015-10-02 17:00
+# màj: 2015-10-04 11:10
 # objet: Conversion de CSV ("Zones De Danger") en GPI (pour GPS Garmin)
 # dépendances: gpsbabel
 # origine: france
@@ -34,7 +34,7 @@ OLDIFS=$IFS
 IFS=","
 
 # variable pour tests uniquement
-FLAG_PERSO=0
+FLAG_TEST=0
 
 # ----------------------------------
 # ---  Définition de fonctions   ---
@@ -47,11 +47,22 @@ csvconv()
 	rm -f "${CSV_CIBLE}" # supprime le fichier cible s'il existe déjà
 	if [ -f ${CSV_SOURCE} ]; then # si le fichier source existe...
 		echo "- Generation de [${POI_CATEGORY}] en cours..."	
-		# si les colonnes dans le fichier csv source sont: longitude, latitude, libellé
-		while read POI_LONG POI_LAT POI_LIB
-		do 
-			# longitude et latitude sont inversées dans le nouveau fichier csv cible
-			# et le POI_LIB (var locale) est remplacé par le POI_NAME (var globale)
+		# en France, la longitude est inférieure à la latitude
+		# on définit ainsi les variables LONG et LAT selon la valeur des colonnes du CSV
+		while read CSV_COL1 CSV_COL2 CSV_COL3
+		do
+			CSV_COL1=${CSV_COL1// /} # supprime les espaces
+			CSV_COL2=${CSV_COL2// /} # supprime les espaces
+			CSV_COL3=${CSV_COL2// /_} # remplace les espaces par underscore
+			if [ `echo $CSV_COL1 | cut -f1 -d.` -lt `echo $CSV_COL2 | cut -f1 -d.` ]; then
+				POI_LONG=${CSV_COL1}
+				POI_LAT=${CSV_COL2}
+			else
+				POI_LAT=${CSV_COL1}
+				POI_LONG=${CSV_COL2}
+			fi
+			# création du nouveau CSV avec latitude, longitude et
+			# le nom du POI est remplacé par le POI_NAME (var globale)
 			echo "${POI_LAT}${IFS}${POI_LONG}${IFS}${POI_NAME}" >> "${CSV_CIBLE}" 
 		done < "${CSV_SOURCE}"
 	else
@@ -229,8 +240,9 @@ gpsbabel -w -i csv -f "${POI_PATH}.csv" -o garmin_gpi,bitmap="${POI_IMG}",catego
 # -----------------------------------------------
 # --- POUR TEST POI PERSO
 # -----------------------------------------------
-if [ $FLAG_PERSO != 0 ]; then
-	CSV_SOURCE="${REP_DATA}/Mes Poi Favoris.csv"
+#if [ $FLAG_TEST != 0 ]; then
+CSV_SOURCE="${REP_DATA}/Mes Poi Favoris.csv"
+if [ -f ${CSV_SOURCE} ]; then
 	POI_CATEGORY='MES POI FAVORIS'
 	POI_NAME='POI_FAVOR'
 	POI_IMG="${REP_IMG}/panneauEpingle.bmp"
