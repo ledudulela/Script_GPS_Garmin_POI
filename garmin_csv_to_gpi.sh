@@ -1,11 +1,11 @@
 #!/bin/bash
 # auteur: ledudulela
-version="1.1"
-# màj: 2015-10-04 11:10
+version="1.2"
+# màj: 2015-10-04 16:54
 # objet: Conversion de CSV ("Zones De Danger") en GPI (pour GPS Garmin)
 # dépendances: gpsbabel
 # origine: france
-# source des fichiers CSV: site web lufop
+# source des fichiers CSV: site web lufop.net
 #---------------------------------------------------------------------------------------------------------------------
 # utilisation:
 #--------------
@@ -54,7 +54,7 @@ csvconv()
 			CSV_COL1=${CSV_COL1// /} # supprime les espaces
 			CSV_COL2=${CSV_COL2// /} # supprime les espaces
 			CSV_COL3=${CSV_COL2// /_} # remplace les espaces par underscore
-			if [ `echo $CSV_COL1 | cut -f1 -d.` -lt `echo $CSV_COL2 | cut -f1 -d.` ]; then
+			if [ `echo $CSV_COL1 | cut -f1 -d.` -lt `echo $CSV_COL2 | cut -f1 -d.` ]; then # compare les parties entières
 				POI_LONG=${CSV_COL1}
 				POI_LAT=${CSV_COL2}
 			else
@@ -229,7 +229,7 @@ gpsbabel -w -i csv -f "${POI_PATH}.csv" -o garmin_gpi,bitmap="${POI_IMG}",catego
 CSV_SOURCE="${REP_DATA}/FR Zone de danger FR Passage Niveau.csv"
 POI_CATEGORY='ZDD FR PASSAGES A NIVEAU'
 POI_NAME='ZDD_FR_PASS_NIV'
-POI_IMG="${REP_IMG}/panneauAttention.bmp"
+POI_IMG="${REP_IMG}/panneauPassNiv.bmp"
 POI_ALERTS=0
 POI_PROXIM="0.0"
 POI_SPEED="0"
