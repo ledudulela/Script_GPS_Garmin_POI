@@ -1,7 +1,7 @@
 #!/bin/bash
 # auteur: ledudulela
-version="1.2"
-# màj: 2015-10-04 16:54
+version="1.3"
+# màj: 2015-10-12 21:31
 # objet: Conversion de CSV ("Zones De Danger") en GPI (pour GPS Garmin)
 # dépendances: gpsbabel
 # origine: france
@@ -16,7 +16,8 @@ version="1.2"
 #---------------------------------------------------------------------------------------------------------------------
 
 # un indicateur temporel de génération des fichiers POI ( par exemple, année+mois des POI )
-GENERATION='2015-09'
+#GENERATION='2015-09'
+read -p "Datez les POI ( exemple au format année-mois: 2015-09 ) : " GENERATION
 
 # préfixe du nom de fichier cible ( exemple pour "Zone de danger française": ZDD_FR_2015-09_ )
 # tous les noms de fichiers générés commenceront par ce préfixe
@@ -75,6 +76,16 @@ csvconv()
 echo "*** GENERATEUR DE P.O.I. GARMIN $GENERATION ( v$version ) ***"
 # ------------------------------------------------------------------------------
 
+# avec-n, le script continue dès qu'une touche est enfoncée sans attendre la validation par la touche Enter
+read -n 1 -p "Voulez-vous continuer ([o] Oui / [n] Non) ? " answer
+case ${answer:0:1} in
+    y|Y|o|O )
+        echo ' '
+    ;;
+    * )
+        exit 2
+    ;;
+esac
 # variables utilisées par gpsbabel et par la fonction de conversion de csv (csvconv)
 # CSV_SOURCE: chemin du fichier source original
 # POI_CATEGORY: la catégorie dans laquelle seront regroupés les POI dans le GPS
@@ -259,5 +270,6 @@ IFS=$OLDIFS
 echo "Fin des traitements."
 echo "Les fichiers se trouvent dans le répertoire ${REP_DATA}"
 echo ""
+read -n 1 -p "Appuyez sur une touche..."
 exit 0
 
